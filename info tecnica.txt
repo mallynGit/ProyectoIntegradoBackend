@@ -1,0 +1,12 @@
+nginx proxy manager es genial:
+
+solucion status offline al añadir custom location
+---
+Workaround:
+
+create empty file named _hsts_map.conf on the same dir as docker-compose.yaml.
+
+Add this line to the volumes of docker-compose.yaml :
+
+- ./_hsts_map.conf:/app/templates/_hsts_map.conf
+---

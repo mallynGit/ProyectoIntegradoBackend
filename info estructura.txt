@@ -1,0 +1,17 @@
+usuarios, mascotas, multimedia mascotas, posts, registros (y accion de registro?), comentarios, preguntas(?), chat (6 tablas)
+
+operacion transaccional
+- registro usuario + una o mas mascotas (todo o nada)
+- acciones de admin contra uno o mas usuarios (y/o mascotas)
+	- bloquear cuenta 1 V
+	- eliminar cuenta 1 V
+	- reiniciar contraseña 1 V
+	- modificar datos 1
+	- 
+
+
+informe de resultados (info resumen extraida de datos)
+- pdf de chat entre dos usuarios
+- resumen actividad usuarios (login, comentarios etc)
+- resumen registro usuarios(?)
+
