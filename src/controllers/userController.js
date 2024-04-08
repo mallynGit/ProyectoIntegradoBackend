@@ -14,30 +14,30 @@ export const get = async (req, res) => {
     delete user.password
 
     if (req.token) {
-        res.json({user, token: req.token})
+        res.json({ user, token: req.token })
     } else {
-        res.send({user, token: signToken({nick: user.nick})})
+        res.send({ user, token: signToken({ nick: user.nick }) })
     }
 }
 
-export const post = async (req, res) => {
+export const registerUser = async (req, res) => {
 
-    const { name, email, password } = req.body
+    const { name, email, password, nick } = req.body
 
     const user = await model.create({
         name,
         email,
         password: bcrypt.hashSync(password, 10),
-        nick: email.split('@')[0],
+        nick: nick ? nick : email.split('@')[0],
     })
 
     res.send(user)
 }
 
-export const update = async (req,res) => {
+export const update = async (req, res) => {
 
     const { id } = req.query
-    const {name, nick} = req.body
+    const { name, nick } = req.body
 
     const user = await model.updateOne({ _id: id }, { name, nick })
 
@@ -45,3 +45,12 @@ export const update = async (req,res) => {
 
 }
 
+export const deleteUser = async (req, res) => {
+
+    const { id } = req.query
+
+    const user = await model.deleteOne({ _id: id })
+
+    res.send(user)
+
+}

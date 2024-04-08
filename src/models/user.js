@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
     },
     name: String,
     email: String,
-    password: String,
+    password: { type: String, select: false },
     nick: String,
     pets: [{ type: mongoose.SchemaTypes.UUID, ref: "Pet" }],
     role: {
