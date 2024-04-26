@@ -3,11 +3,13 @@ import dotenv from 'dotenv'
 import router from './routes/main.js'
 import db from './db/db.js'
 import { verifyToken } from './middleware/jwt.js';
+import cors from 'cors'
 
 const app = express()
 dotenv.config()
 
 app.use(express.json())
+app.use(cors())
 
 
     app.use(verifyToken)

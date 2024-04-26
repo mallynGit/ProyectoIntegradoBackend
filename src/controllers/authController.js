@@ -19,3 +19,19 @@ export const login = async (req, res) => {
     res.send(signToken({ nick: user.nick, _id: user._id }))
 
 }
+
+export const register = async (req, res) => {
+
+    const { nombre, apellidos, email, password, nick } = req.body
+
+    const userExists = await model.findOne({ $or: [{ email }, { nick }] })
+
+    if (userExists) {
+        return res.status(403).send({ error: 'User already exists' })
+    }
+
+    const user = await model.create({ nombre, apellidos, email, password, nick })
+
+    res.send(user)
+
+}

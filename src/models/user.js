@@ -7,11 +7,13 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: () => crypto.randomUUID()
     },
-    name: String,
-    email: String,
-    password: { type: String, select: false },
     nick: String,
-    pets: [{ type: mongoose.SchemaTypes.UUID, ref: "Pet" }],
+    nombre: String,
+    apellidos: String,
+    email: String,
+    password: { type: String },
+    pets: [{ type: String, ref: "Pet" }],
+    posts: [{ type: String, ref: "Posts" }],
     role: {
         type: String,
         default: 'USER'
