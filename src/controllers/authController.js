@@ -22,6 +22,8 @@ export const register = async (req, res) => {
   const { name, email, password, nick } = req.body;
   const userExists = await model.findOne({ $or: [{ email }, { nick }] });
 
+
+  //funciona
   if (userExists) {
     return res.status(403).send({ error: "User already exists" });
   }
