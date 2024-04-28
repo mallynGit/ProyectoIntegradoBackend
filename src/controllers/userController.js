@@ -10,6 +10,9 @@ export const get = async (req, res) => {
 
     const { name } = req.query
 
+    if (!name) {
+        return res.send(await model.find({}, { password: 0 }))
+    }
     const user = await model.findOne({ name })
     delete user.password
 
