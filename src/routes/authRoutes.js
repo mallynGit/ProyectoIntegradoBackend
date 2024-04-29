@@ -1,9 +1,11 @@
 import { Router } from "express";
-import { login, register } from '../controllers/authController.js'
+import { login, register, tokenCheck } from '../controllers/authController.js'
+import { verifyToken } from '../middleware/jwt.js'
 
 const router = Router();
 
 router.post("/login", login)
 router.post("/register", register)
+router.post("/check", verifyToken, tokenCheck)
 
 export default router

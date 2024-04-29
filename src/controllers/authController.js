@@ -1,6 +1,6 @@
 import { model } from "../models/user.js";
 import bcrypt from "bcrypt";
-import { signToken } from "../middleware/jwt.js";
+import { signToken, checkToken, decodeToken } from "../utils/authToken.js";
 
 export const login = async (req, res) => {
   const { email, password, name } = req.body;
@@ -19,7 +19,7 @@ export const login = async (req, res) => {
 };
 
 export const register = async (req, res) => {
-  const { name, email, password, nick } = req.body;
+  const { nombre, apellidos, email, password, nick } = req.body;
   const userExists = await model.findOne({ $or: [{ email }, { nick }] });
 
 
@@ -29,10 +29,32 @@ export const register = async (req, res) => {
   }
 
   const user = await model.create({
-    name,
+    nombre,
+    apellidos,
     email,
     password: bcrypt.hashSync(password, 10),
     nick: nick ? nick : email.split("@")[0],
   });
   res.send(user);
 };
+
+export const tokenCheck = async (req, res) => {
+  try {
+    if (req.token) {
+      const token = await checkToken(req.token)
+      const decoded = await decodeToken(req.token)
+      const user = await model.findOne({ _id: decoded._id })
+
+      // const user = await model.findOne({ _id: ()._id })
+      if (!token) {
+        return res.status(401).send({ error: 'Invalid token' })
+      } else {
+        return res.status(200).send({ token, role: user.role })
+      }
+    }
+    //no hay token??? no creo que llegue a este punto
+    res.status(500).send({ error: 'error del backend' })
+  } catch (err) {
+    console.log('ERR - checkToken: ', err)
+  }
+}

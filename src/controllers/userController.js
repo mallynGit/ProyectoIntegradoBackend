@@ -1,10 +1,7 @@
-import express from 'express';
+
 import { model } from '../models/user.js'
-import db from '../db/db.js'
-import { default as jwt } from 'jsonwebtoken'
+
 import bcrypt from 'bcrypt'
-import crypto from 'crypto'
-import { signToken } from '../middleware/jwt.js';
 
 export const get = async (req, res) => {
 
@@ -25,10 +22,11 @@ export const get = async (req, res) => {
 
 export const registerUser = async (req, res) => {
 
-    const { name, email, password, nick } = req.body
+    const { nombre, apellidos, email, password, nick } = req.body
 
     const user = await model.create({
-        name,
+        nombre,
+        apellidos,
         email,
         password: bcrypt.hashSync(password, 10),
         nick: nick ? nick : email.split('@')[0],
@@ -50,9 +48,9 @@ export const update = async (req, res) => {
 
 export const deleteUser = async (req, res) => {
 
-    const { id } = req.query
+    const { id } = req.params
 
-    const user = await model.deleteOne({ _id: id })
+    const user = await model.deleteOne({ _id: id }, {}, { new: true })
 
     res.send(user)
 

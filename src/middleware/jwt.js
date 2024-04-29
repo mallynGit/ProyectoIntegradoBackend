@@ -1,5 +1,6 @@
 import { default as jwt } from 'jsonwebtoken'
 import dotenv from 'dotenv'
+import { checkToken } from '../utils/authToken.js'
 dotenv.config()
 
 export const verifyToken = (req, res, next) => {
@@ -9,9 +10,16 @@ export const verifyToken = (req, res, next) => {
 
         if (token) {
             token.slice(0, 6) === 'Bearer' ? token = token.slice(7) : token
+
+            if (checkToken(token) == false) {
+                return res.status(401).send({ error: 'Invalid token jwt' })
+            }
+        } else{
+            console.log(req, '?')
+            return res.status(401).send({ error: 'no hay token'})
         }
 
-        req.token = jwt.decode(token)
+        req.token = token
     } catch (err) {
         console.log(err);
     }
@@ -21,8 +29,3 @@ export const verifyToken = (req, res, next) => {
 
 }
 
-export const signToken = (payload) => {
-
-    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '10m' })
-
-}
