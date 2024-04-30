@@ -12,10 +12,9 @@ export const verifyToken = (req, res, next) => {
             token.slice(0, 6) === 'Bearer' ? token = token.slice(7) : token
 
             if (checkToken(token) == false) {
-                return res.status(401).send({ error: 'Invalid token jwt' })
+                return res.status(401).send({ error: 'invalid-token' })
             }
         } else{
-            console.log(req, '?')
             return res.status(401).send({ error: 'no hay token'})
         }
 
@@ -23,9 +22,6 @@ export const verifyToken = (req, res, next) => {
     } catch (err) {
         console.log(err);
     }
-
     next()
-
-
 }
 
