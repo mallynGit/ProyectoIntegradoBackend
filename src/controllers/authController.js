@@ -40,9 +40,11 @@ export const register = async (req, res) => {
 
 export const tokenCheck = async (req, res) => {
   try {
-    if (req.token) {
-      const token = await checkToken(req.token)
-      const decoded = await decodeToken(req.token)
+    let reqToken = req.headers.authorization
+
+    if (token) {
+      const token = await checkToken(reqToken)
+      const decoded = await decodeToken(reqToken)
       const user = await model.findOne({ _id: decoded._id })
 
       // const user = await model.findOne({ _id: ()._id })
