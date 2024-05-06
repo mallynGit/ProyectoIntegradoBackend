@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 export const signToken = (payload) => {
-    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '10m' })
+    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '15s' })
 }
 
 export const decodeToken = (payload) => {
