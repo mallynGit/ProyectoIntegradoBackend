@@ -13,6 +13,7 @@ export const decodeToken = (payload) => {
 export const checkToken = (payload) => {
     return jwt.verify(payload, process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
+            console.log(err, 'err desde checktoken')
             return false
         }
         return true

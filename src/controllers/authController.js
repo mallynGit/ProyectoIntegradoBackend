@@ -42,20 +42,25 @@ export const tokenCheck = async (req, res) => {
   try {
     let reqToken = req.headers.authorization
 
-    if (token) {
-      const token = await checkToken(reqToken)
+    if (reqToken) {
+
+      reqToken.slice(0, 6) === 'Bearer' ? reqToken = reqToken.slice(7) : reqToken
+      let check = checkToken(reqToken)
+      
+      if (!check) {
+        return res.status(401).send({ error: 'Invalid token' })
+      }
       const decoded = await decodeToken(reqToken)
       const user = await model.findOne({ _id: decoded._id })
 
       // const user = await model.findOne({ _id: ()._id })
-      if (!token) {
-        return res.status(401).send({ error: 'Invalid token' })
-      } else {
-        return res.status(200).send({ token, role: user.role })
-      }
+
+      return res.status(200).send({ token: check, role: user.role })
+
+    } else {
+      //no hay token??? no creo que llegue a este punto
+      res.status(500).send({ error: 'error del backend' })
     }
-    //no hay token??? no creo que llegue a este punto
-    res.status(500).send({ error: 'error del backend' })
   } catch (err) {
     console.log('ERR - checkToken: ', err)
   }
