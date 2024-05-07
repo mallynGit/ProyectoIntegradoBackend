@@ -37,11 +37,12 @@ export const registerUser = async (req, res) => {
 
 export const update = async (req, res) => {
 
-    const { id } = req.query
-    const { name, nick } = req.body
+    const { id } = req.params
+    const { nombre, apellidos, email, nick } = req.body
 
-    const user = await model.updateOne({ _id: id }, { name, nick })
+    console.log(req.body)
 
+    const user = await model.findOneAndUpdate({ _id: id }, { nombre, apellidos, email, nick })
     res.send(user)
 
 }

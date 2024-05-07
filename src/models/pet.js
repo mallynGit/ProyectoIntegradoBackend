@@ -11,7 +11,10 @@ const petSchema = new mongoose.Schema({
     raza: String,
     categoria: String,
     edad: Number,
-    foto_perfil: String,
+    foto_perfil: { type: String, ref: "Multimedia" },
+    multimedia: [{type: String, ref: "Multimedia"}],
+    posts: [{ type: String, ref: "Post" }],
+    comentarios: [{ type: String, ref: "Comentario" }],
 },
     { versionKey: false }
 )

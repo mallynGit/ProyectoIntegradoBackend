@@ -8,8 +8,6 @@ const multimediaSchema = new mongoose.Schema({
         default: () => crypto.randomUUID()
     },
     tipo: String,
-    id_padre: String,
-    tipo_padre: String,
 },
     { versionKey: false, collection: 'multimedia' }
 )
