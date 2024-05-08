@@ -10,9 +10,9 @@ export const get = async (req, res) => {
 
 export const post = async (req, res) => {
 
-    const { tipo, id_padre, tipo_padre } = req.body
-    const media = await model.create({ tipo, id_padre, tipo_padre })
-    res.json(media)
+    const { tipo, _id } = req.body
+   
+    res.send('bien!')           
 
 }
 

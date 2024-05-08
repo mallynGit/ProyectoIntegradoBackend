@@ -1,5 +1,5 @@
 #Other directories
-uploads/*
+src/uploads/*
 # Logs
 logs
 *.log

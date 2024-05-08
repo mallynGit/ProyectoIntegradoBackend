@@ -7,7 +7,7 @@ const petSchema = new mongoose.Schema({
         type: String,
         default: () => crypto.randomUUID()
     },
-    name: String,
+    nombre: String,
     raza: String,
     categoria: String,
     edad: Number,

@@ -5,17 +5,17 @@ const __dirname = path.resolve() + '/src'
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        console.log(req.body)
+        console.log(req.query)
         cb(null, path.join(__dirname, '/uploads'))
     },
     filename: (req, file, cb) => {
-        cb(null, crypto.randomUUID() + path.extname(file.originalname))
+        cb(null, (req.query.filename ? req.query.filename : crypto.randomUUID()) + path.extname(file.originalname))
     }
 })
 
 const fileFilter = (req, file, callback) => {
     const ext = path.extname(file.originalname)
-    if (ext !== '.jpg' && ext !== '.jpeg' && ext !== '.png') {
+    if (ext !== '.jpg' && ext !== '.jpeg' && ext !== '.png' && ext !== '.webp') {
         return callback('Only images are allowed', false)
     }
     callback(null, true)

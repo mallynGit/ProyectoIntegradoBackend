@@ -17,7 +17,7 @@ export const getById = async (req, res) => {
 
 export const create = async (req, res) => {
 
-    const { name, raza, categoria, edad } = req.body
+    const { nombre, raza, categoria, edad } = req.body
     let pet, multimedia, mediaId
     try {
         if (req.file) {
@@ -25,7 +25,7 @@ export const create = async (req, res) => {
             console.log(req.file)
             multimedia = await media.create({ _id: mediaId[0], tipo: mediaId[1] })
         }
-        pet = await model.create({ name, raza, categoria, edad, foto_perfil: req.file ? multimedia._id : null })
+        pet = await model.create({ nombre, raza, categoria, edad, foto_perfil: req.file ? multimedia._id : null })
         pet.multimedia.push(multimedia._id)
         pet.save()
     } catch (err) {
