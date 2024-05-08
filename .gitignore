@@ -1,5 +1,8 @@
 #Other directories
-src/uploads/*
+*.webp
+*.jpg
+*.png
+*.jpeg
 # Logs
 logs
 *.log
