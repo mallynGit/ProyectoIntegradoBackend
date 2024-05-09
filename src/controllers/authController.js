@@ -1,15 +1,19 @@
 import { model } from "../models/user.js";
+import { model as media } from '../models/multimedia.js'
 import bcrypt from "bcrypt";
 import { signToken, checkToken, decodeToken } from "../utils/authToken.js";
 
 export const login = async (req, res) => {
   const { email, password, name } = req.body;
 
-  const user = await model.findOne({ email });
+  let user = await model.findOne({ email });
 
   if (!user) {
     return res.status(404).send({ error: "User not found" });
   }
+
+  let pfp = await media.findOne({ _id: user._id })
+  console.log(pfp)
 
   if (!bcrypt.compareSync(password, user.password)) {
     return res.status(401).send({ error: "Login failed" });
@@ -17,13 +21,16 @@ export const login = async (req, res) => {
 
   delete user.password
 
-  res.send({ token: signToken({ nick: user.nick, _id: user._id }), user });
+  res.send({ token: signToken({ nick: user.nick, _id: user._id }), user: { profilePicture: pfp._id + '.' + pfp.tipo, ...user._doc } });
 };
 
 export const register = async (req, res) => {
+  try{
   const { nombre, apellidos, email, password, nick } = req.body;
   const userExists = await model.findOne({ $or: [{ email }, { nick }] });
+  console.log(req.body,' probando testeo hola?')
 
+  let userId
   let trimmedPassword = password.replace(/\s/g, '');
 
   const regexEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -41,14 +48,24 @@ export const register = async (req, res) => {
     return res.status(403).send({ error: "User already exists" });
   }
 
-  const user = await model.create({
+  if (req.file) {
+    userId = req.file.filename.split('.')[0];
+    media.create({ _id: userId, tipo: req.file.filename.split('.')[1] })
+  }
+
+  let user = await model.create({
+    _id: userId ? userId : undefined,
     nombre,
     apellidos,
     email,
     password: bcrypt.hashSync(trimmedPassword, 10),
     nick: nick ? nick : email.split("@")[0],
   });
+
   res.send(user);
+}catch(err){
+  console.log(err, ' - register')
+}
 };
 
 export const tokenCheck = async (req, res) => {

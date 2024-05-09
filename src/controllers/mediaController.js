@@ -9,10 +9,8 @@ export const get = async (req, res) => {
 }
 
 export const post = async (req, res) => {
-
-    const { tipo, _id } = req.body
    
-    res.send('bien!')           
+    res.json({ filename: req.params.filename })           
 
 }
 
