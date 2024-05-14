@@ -21,51 +21,51 @@ export const login = async (req, res) => {
 
   delete user.password
 
-  res.send({ token: signToken({ nick: user.nick, _id: user._id }), user: { profilePicture: pfp._id + '.' + pfp.tipo, ...user._doc } });
+  res.send({ token: signToken({ nick: user.nick, _id: user._id }), user: { profilePicture: pfp ? pfp._id + '.' + pfp.tipo : null, ...user._doc } });
 };
 
 export const register = async (req, res) => {
-  try{
-  const { nombre, apellidos, email, password, nick } = req.body;
-  const userExists = await model.findOne({ $or: [{ email }, { nick }] });
-  console.log(req.body,' probando testeo hola?')
+  try {
+    const { nombre, apellidos, email, password, nick } = req.body;
+    const userExists = await model.findOne({ $or: [{ email }, { nick }] });
+    console.log(req.body, ' probando testeo hola?')
 
-  let userId
-  let trimmedPassword = password.replace(/\s/g, '');
+    let userId
+    let trimmedPassword = password.replace(/\s/g, '');
 
-  const regexEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-  if (!regexEmail.test(email)) {
-    return res.status(403).send({ error: "Email is not valid" });
+    const regexEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (!regexEmail.test(email)) {
+      return res.status(403).send({ error: "Email is not valid" });
+    }
+
+    const regexPass = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^\w\d\s])[A-Za-z\d\W]{8,}$/
+    if (!regexPass.test(trimmedPassword)) {
+      return res.status(403).send({ error: "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character" });
+    }
+
+    //funciona
+    if (userExists) {
+      return res.status(403).send({ error: "User already exists" });
+    }
+
+    if (req.file) {
+      userId = req.file.filename.split('.')[0];
+      media.create({ _id: userId, tipo: req.file.filename.split('.')[1] })
+    }
+
+    let user = await model.create({
+      _id: userId ? userId : undefined,
+      nombre,
+      apellidos,
+      email,
+      password: bcrypt.hashSync(trimmedPassword, 10),
+      nick: nick ? nick : email.split("@")[0],
+    });
+
+    res.send(user);
+  } catch (err) {
+    console.log(err, ' - register')
   }
-
-  const regexPass = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^\w\d\s])[A-Za-z\d\W]{8,}$/
-  if (!regexPass.test(trimmedPassword)) {
-    return res.status(403).send({ error: "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character" });
-  }
-
-  //funciona
-  if (userExists) {
-    return res.status(403).send({ error: "User already exists" });
-  }
-
-  if (req.file) {
-    userId = req.file.filename.split('.')[0];
-    media.create({ _id: userId, tipo: req.file.filename.split('.')[1] })
-  }
-
-  let user = await model.create({
-    _id: userId ? userId : undefined,
-    nombre,
-    apellidos,
-    email,
-    password: bcrypt.hashSync(trimmedPassword, 10),
-    nick: nick ? nick : email.split("@")[0],
-  });
-
-  res.send(user);
-}catch(err){
-  console.log(err, ' - register')
-}
 };
 
 export const tokenCheck = async (req, res) => {
