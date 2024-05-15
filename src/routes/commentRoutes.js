@@ -4,7 +4,7 @@ import {deleteComment, get, post, update} from '../controllers/comentarioControl
 const router = Router();
 
 router.get('/getAll', get)
-router.post('/createComment', post)
+router.post('/comment', post)
 router.put('/update', update)
 router.delete('/delete', deleteComment)
 

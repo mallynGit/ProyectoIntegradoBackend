@@ -1,4 +1,6 @@
 import { model } from '../models/comentario.js'
+import { model as user } from '../models/user.js'
+import { model as pet } from '../models/pet.js'
 
 export const get = async (req, res) => {
 
@@ -9,9 +11,27 @@ export const get = async (req, res) => {
 
 export const post = async (req, res) => {
 
-    const { contenido, autor } = req.body
+    const { contenido, autor, perfil } = req.body
     const comment = await model.create({ contenido, autor })
-    res.json(comment)
+
+    const foundUser = await user.findOne({ _id: perfil })
+    const foundPet = await pet.findOne({ _id: perfil })
+
+    console.log(foundPet, foundUser, ':)')
+    if(foundUser){
+        foundUser.comentarios.push(comment._id)
+        foundUser.save()
+    } else if(foundPet){
+        console.log(foundPet.comentarios, 'foundPet.comments')
+        foundPet.comentarios.push(comment._id)
+        foundPet.save()
+    } else{
+        return res.status(404).send({ error: 'User or pet not found' })
+    }
+
+
+
+        res.json(comment)
 }
 
 export const update = async (req, res) => {

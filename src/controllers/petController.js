@@ -37,8 +37,25 @@ export const get = async (req, res) => {
 }
 
 export const getById = async (req, res) => {
-    const pet = await model.findById({ _id: req.params.id }).populate({ path: 'multimedia' })
-    res.json(pet)
+    const { id } = req.params
+    console.log(id, 'pprprp')
+
+    const test = await model.aggregate([
+        {
+            $lookup: {
+                from: "users",
+                localField: '_id',
+                foreignField: 'pets',
+                as: 'master'
+            }
+        },
+    ]).unwind('$master');
+    
+    const hola = await model.populate(test, { path: 'foto_perfil multimedia' })
+    let adios = await user.populate(hola, { path: 'master', select: '-password -pets -posts -role -email' })
+    adios = await model.populate(adios, {path: 'comentarios'})
+    adios = adios.filter(pet => pet._id == id)
+    res.json(adios)
 }
 
 export const create = async (req, res) => {
