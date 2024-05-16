@@ -18,20 +18,18 @@ export const post = async (req, res) => {
     const foundPet = await pet.findOne({ _id: perfil })
 
     console.log(foundPet, foundUser, ':)')
-    if(foundUser){
+    if (foundUser) {
         foundUser.comentarios.push(comment._id)
         foundUser.save()
-    } else if(foundPet){
+        return res.json(foundUser)
+    } else if (foundPet) {
         console.log(foundPet.comentarios, 'foundPet.comments')
         foundPet.comentarios.push(comment._id)
         foundPet.save()
-    } else{
+        return res.json(foundPet)
+    } else {
         return res.status(404).send({ error: 'User or pet not found' })
     }
-
-
-
-        res.json(comment)
 }
 
 export const update = async (req, res) => {

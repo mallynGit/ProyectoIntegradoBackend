@@ -54,6 +54,7 @@ export const getById = async (req, res) => {
     const hola = await model.populate(test, { path: 'foto_perfil multimedia' })
     let adios = await user.populate(hola, { path: 'master', select: '-password -pets -posts -role -email' })
     adios = await model.populate(adios, {path: 'comentarios'})
+    adios = await model.populate(adios, {path: 'comentarios.autor', select:'nick _id'})
     adios = adios.filter(pet => pet._id == id)
     res.json(adios)
 }
