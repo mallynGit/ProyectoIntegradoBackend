@@ -5,7 +5,7 @@ const __dirname = path.resolve() + '/src'
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        console.log(req.query)
+        console.log(req.query, file, 'query y file ?')
         cb(null, path.join(__dirname, '/uploads'))
     },
     filename: (req, file, cb) => {
@@ -22,5 +22,7 @@ const fileFilter = (req, file, callback) => {
 }
 
 const upload = multer({ storage, fileFilter }).single('media')
+const multi = multer({ storage, fileFilter }).array('multi')
 
+export { multi }
 export default upload

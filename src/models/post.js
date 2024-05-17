@@ -7,6 +7,7 @@ const postSchema = new mongoose.Schema({
         type: String,
         default: () => crypto.randomUUID()
     },
+    titulo: String,
     contenido: String,
     multimedia : [String],
     autor: {

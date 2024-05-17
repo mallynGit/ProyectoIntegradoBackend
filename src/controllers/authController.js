@@ -19,9 +19,10 @@ export const login = async (req, res) => {
     return res.status(401).send({ error: "Login failed" });
   }
 
-  delete user.password
+  delete user._doc.password
+  
 
-  res.send({ token: signToken({ nick: user.nick, _id: user._id }), user: { profilePicture: pfp ? pfp._id + '.' + pfp.tipo : null, ...user._doc } });
+  res.send({ token: signToken({ nick: user.nick, _id: user._id }), user });
 };
 
 export const register = async (req, res) => {
