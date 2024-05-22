@@ -17,7 +17,7 @@ export const get = async (req, res) => {
         },
     ]).unwind('$master');
 
-    const hola = await model.populate(test, { path: 'foto_perfil multimedia' })
+    const hola = await model.populate(test, { path: 'multimedia' })
     const adios = await user.populate(hola, { path: 'master', select: '-password -pets -posts -role -email' })
 
     const puppets = await user.find({ pets: { $exists: true, $not: { $size: 0 } } })
@@ -50,12 +50,22 @@ export const getById = async (req, res) => {
             }
         },
     ]).unwind('$master');
-    
-    const hola = await model.populate(test, { path: 'foto_perfil multimedia' })
+
+    const hola = await model.populate(test, { path: 'multimedia' })
     let adios = await user.populate(hola, { path: 'master', select: '-password -pets -posts -role -email' })
-    adios = await model.populate(adios, {path: 'comentarios'})
-    adios = await model.populate(adios, {path: 'comentarios.autor', select:'nick _id'})
+    adios = await model.populate(adios, { path: 'comentarios' })
+    adios = await model.populate(adios, { path: 'comentarios.autor', select: 'nick _id' })
+    adios = await model.populate(adios, { path: 'comentarios.respuestas', select: '-respuestas' })
+    adios = await user.populate(adios, { path: 'comentarios.respuestas.autor', select: 'nick _id' })
+
     adios = adios.filter(pet => pet._id == id)
+
+    adios.forEach(pet => {
+        pet.comentarios.forEach(comentario => {
+            comentario.respuestas.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        });
+    });
+
     res.json(adios)
 }
 

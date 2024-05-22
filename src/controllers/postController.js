@@ -19,6 +19,15 @@ export const getByPetId = async (req, res) => {
 
 }
 
+export const getByPostId = async (req, res) => {
+
+    const { id } = req.params
+    const post = await model.findById({ _id: id })
+
+    res.send(post)
+
+}
+
 export const createPost = async (req, res) => {
 
     const { titulo, contenido, pet, autor } = req.body

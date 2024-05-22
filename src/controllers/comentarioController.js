@@ -32,6 +32,23 @@ export const post = async (req, res) => {
     }
 }
 
+export const reply = async (req, res) => {
+
+    const { contenido, autor, id } = req.body
+
+    const found = await model.findById({ _id: id })
+
+    if (found) {
+        const reply = await model.create({ contenido, autor })
+        found.respuestas.push(reply._id)
+        found.save()
+        res.json({ status: 'ok' })
+    } else {
+        return res.status(404).send({ error: 'Comment not found' })
+    }
+
+}
+
 export const update = async (req, res) => {
 
     const { id } = req.query

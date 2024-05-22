@@ -12,6 +12,7 @@ const comentarioSchema = new mongoose.Schema({
         ref: "User"
     },
     contenido: String,
+    respuestas: [{ type: String, ref: "Comentario" }],
     timestamp: { type: Date, default: Date.now }
 },
     { versionKey: false }
