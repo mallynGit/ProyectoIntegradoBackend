@@ -1,5 +1,4 @@
 import { model } from "../models/user.js";
-import { model as media } from '../models/multimedia.js'
 import { model as pet } from '../models/pet.js'
 import bcrypt from "bcrypt";
 import { signToken, checkToken, decodeToken } from "../utils/authToken.js";
@@ -15,8 +14,6 @@ export const login = async (req, res) => {
     return res.status(404).send({ error: "User not found" });
   }
 
-  let pfp = await media.findOne({ _id: user._id })
-  console.log(pfp)
 
   if (!bcrypt.compareSync(password, user.password)) {
     return res.status(401).send({ error: "Login failed" });

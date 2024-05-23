@@ -1,11 +1,10 @@
 import { model } from '../models/pet.js'
-import { model as media } from '../models/multimedia.js'
 import { model as user } from '../models/user.js'
 import fs from 'fs'
 
 export const get = async (req, res) => {
 
-    let pets = await model.find({}).populate(['foto_perfil', 'multimedia'])
+    let pets = await model.find({}).populate(['foto_perfil'])
     const test = await model.aggregate([
         {
             $lookup: {
@@ -17,8 +16,7 @@ export const get = async (req, res) => {
         },
     ]).unwind('$master');
 
-    const hola = await model.populate(test, { path: 'multimedia' })
-    const adios = await user.populate(hola, { path: 'master', select: '-password -pets -posts -role -email' })
+    const adios = await user.populate(test, { path: 'master', select: '-password -pets -posts -role -email' })
 
     const puppets = await user.find({ pets: { $exists: true, $not: { $size: 0 } } })
 
@@ -77,7 +75,6 @@ export const create = async (req, res) => {
         if (req.file) {
             mediaId = req.file.filename.split('.')
             console.log(req.file)
-            multimedia = await media.create({ _id: mediaId[0], tipo: mediaId[1] })
         }
         let petMaster = await user.findById({ _id: userId })
         pet = await model.create({ nombre, raza, categoria, edad, foto_perfil: req.file ? multimedia._id : null })
@@ -100,10 +97,10 @@ export const create = async (req, res) => {
 
 export const update = async (req, res) => {
 
-    const { name, raza, categoria, edad, foto_perfil, _id } = req.body
+    const { nombre, raza, categoria, edad, foto_perfil, _id } = req.body
 
-    model.findByIdAndUpdate({ _id }, { name, raza, categoria, edad, foto_perfil }, { new: true }).then((updated) => {
-        res.json({ updated })
+    model.findByIdAndUpdate({ _id }, { nombre, raza, categoria, edad, foto_perfil }, { new: true }).then((updated) => {
+        res.json(updated)
     }).catch((err) => {
         console.log(err);
         return res.status(500).send({ error: 'Error updating pet' })
@@ -117,12 +114,11 @@ export const deletePet = async (req, res) => {
     try {
         const { id } = req.query
 
-        const deletedPet = await model.findByIdAndDelete({ _id: id }).populate({ path: 'multimedia' })
+        const deletedPet = await model.findByIdAndDelete({ _id: id })
         console.log(deletedPet)
         for (let multimedia of deletedPet.multimedia) {
             await media.deleteOne({ _id: multimedia._id })
-            console.log(multimedia._id + '.' + multimedia.tipo)
-            fs.unlinkSync('./src/uploads/' + multimedia._id + '.' + multimedia.tipo)
+            // fs.unlinkSync('./src/uploads/' + multimedia._id + '.' + multimedia.tipo)
         }
 
         if (deletedPet == null) {

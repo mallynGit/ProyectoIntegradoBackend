@@ -12,7 +12,7 @@ const petSchema = new mongoose.Schema({
     categoria: String,
     edad: Number,
     foto_perfil: { type: String },
-    multimedia: [{type: String, ref: "Multimedia"}],
+    multimedia: [{ type: String }],
     posts: [{ type: String, ref: "Post" }],
     comentarios: [{ type: String, ref: "Comentario" }],
 },
