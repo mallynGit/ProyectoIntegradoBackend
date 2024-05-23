@@ -10,15 +10,17 @@ export const verifyToken = (req, res, next) => {
 
         if (token) {
             token.slice(0, 6) === 'Bearer' ? token = token.slice(7) : token
-
-            if (checkToken(token) == false) {
+            let check = checkToken(token)
+            if (check == false) {
                 return res.status(401).send({ error: 'invalid-token' })
+            } else if (check == 'expired') {
+                return res.status(401).send({ error: 'expired' })
             }
-        } else{
-            return res.status(401).send({ error: 'no hay token'})
+        } else {
+            return res.status(401).send({ error: 'no hay token' })
         }
 
-        req.token = token
+        req.token = jwt.decode(token)
     } catch (err) {
         console.log(err);
     }

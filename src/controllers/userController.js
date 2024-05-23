@@ -10,14 +10,10 @@ export const get = async (req, res) => {
     if (!name) {
         return res.send(await model.find({}, { password: 0 }))
     }
-    const user = await model.findOne({ name })
-    delete user.password
+    const user = await model.findOne({ nick: name }, { password: 0 })
 
-    if (req.token) {
-        res.json({ user, token: req.token })
-    } else {
-        res.send({ user, token: signToken({ nick: user.nick }) })
-    }
+    res.json(user)
+
 }
 
 export const registerUser = async (req, res) => {
@@ -40,9 +36,20 @@ export const update = async (req, res) => {
     const { id } = req.params
     const { nombre, apellidos, email, nick } = req.body
 
-    console.log(req.body)
-
-    const user = await model.findOneAndUpdate({ _id: id }, { nombre, apellidos, email, nick })
+    console.log(req.token)
+    const requestant = await model.findOne({ _id: req.token })
+    let user;
+    if (requestant._id != id) {
+        if (requestant.role.toLowerCase() != 'admin') {
+            return res.status(401).send({ error: 'Not authorized' })
+        } else {
+            user = await model.findOneAndUpdate({ _id: id }, { nombre, apellidos, email, nick })
+        }
+    } else {
+        user = await model.findOneAndUpdate({ _id: requestant._id }, { nombre, apellidos, email, nick }, { new: true })
+    }
+    // console.log(req.body)
+    user = await model.findOne({ _id: user._id }, { password: 0 })
     res.send(user)
 
 }
