@@ -7,13 +7,17 @@ const reporteSchema = new mongoose.Schema({
         type: String,
         default: () => crypto.randomUUID()
     },
-    autor: {
+    reportante: {
         type: String,
         ref: "User"
     },
-    contenido: String,
-    reportado: String,
-    tipo: String,
+    contenido: { type: String, required: true },
+    reportedId: { type: String, required: true },
+    tipo: {
+        type: String,
+        enum: ['Comentario', 'Post', 'Mascota', 'Media'],
+        required: true
+    },
     timestamp: { type: Date, default: Date.now }
 },
     { versionKey: false }
