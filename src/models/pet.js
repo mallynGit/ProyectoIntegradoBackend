@@ -11,6 +11,8 @@ const petSchema = new mongoose.Schema({
     raza: String,
     categoria: String,
     edad: Number,
+    peso: Number,
+    sexo: String,
     foto_perfil: { type: String },
     multimedia: [{ type: String }],
     posts: [{ type: String, ref: "Post" }],

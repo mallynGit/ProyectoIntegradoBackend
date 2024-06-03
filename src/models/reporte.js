@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { now } from "mongoose";
 import db from "../db/db.js";
 
 
@@ -18,6 +18,7 @@ const reporteSchema = new mongoose.Schema({
         enum: ['Comentario', 'Post', 'Mascota', 'Media'],
         required: true
     },
+    resuelto: { type: Boolean, default: false },
     timestamp: { type: Date, default: Date.now }
 },
     { versionKey: false }

@@ -24,8 +24,8 @@ export const createReport = async (req, res) => {
 
 export const getAll = async (req, res) => {
     try {
-        const reports = await model.find({});
-
+        const reports = await model.find({}).populate({ path: 'reportante', select: 'nick _id' });
+        
         const promises = reports.map(report => {
             let r = report.toObject();
             return new Promise((resolve, reject) => {
