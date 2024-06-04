@@ -6,6 +6,7 @@ RUN npm install
 RUN npm config set proxy http://172.31.43.173:80
 COPY . .
 EXPOSE 3001
+EXPOSE 4000
 CMD [ "node", "src/index.js" ]
 
 # docker build -t maruizlosada/backend-tfg:v1 .
