@@ -5,6 +5,7 @@ import petRoutes from './petRoutes.js'
 import postRoutes from './postRoutes.js'
 import commentRoutes from './commentRoutes.js'
 import reportRoutes from './reportRoutes.js'
+import conversationRoutes from './conversationRoutes.js'
 
 const router = Router()
 
@@ -14,6 +15,7 @@ router.use('/pets', petRoutes)
 router.use('/posts', postRoutes)
 router.use('/comments', commentRoutes)
 router.use('/reports', reportRoutes)
+router.use('/chat', conversationRoutes)
 
 router.get('/', (req, res) => {
     res.send('funcionando')
