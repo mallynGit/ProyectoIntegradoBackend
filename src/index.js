@@ -5,17 +5,19 @@ import db from "./db/db.js";
 import fs from "fs";
 import path from "path";
 import cors from "cors";
-import { default as ws } from "./server/websocket.js";
+import { default as wsServ } from "./server/websocket.js";
 import expressWs from "express-ws";
+import http from 'http'
 
 const __dirname = path.resolve() + "/src";
 
 const app = express();
 dotenv.config();
 
+const server = http.createServer(app)
+
 try {
-  ws.options.noServer = false;
-  const wsTest = expressWs(app).getWss();
+  
   console.log(
     process.env.TZ,
     "process.env.TZ",
@@ -56,22 +58,24 @@ try {
     });
   });
 
-  app.ws("/ws", function (ws, req) {
-    console.log("new connection");
+  server.on("upgrade", (request, socket, head) => {
+    wsServ.handleUpgrade(request, socket, head, (ws) => {
+      wsServ.emit("connection", ws, request);
+      console.log("upgrade handled?");
+    });
   });
 
-  app.get("/ws", function (req, res) {
-    console.log(wsTest.clients);
-    res.send('jaja')
-  });
+  server.listen(process.env.APP_PORT, () =>
+    console.log(`Listening on port ${process.env.APP_PORT}`)
+  );
 
   // ws.options.server = app;
   // ws.options.noServer = false;
 
   // app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
-  app.listen(process.env.APP_PORT, () =>
-    console.log(`Listening on port ${process.env.APP_PORT}`)
-  );
+  // app.listen(process.env.APP_PORT, () =>
+  //   console.log(`Listening on port ${process.env.APP_PORT}`)
+  // );
 } catch (err) {
   console.log("Crash at " + new Date() + " with error: " + err);
 }

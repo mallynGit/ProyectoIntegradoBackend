@@ -33,6 +33,11 @@ wsServ.on("connection", (ws) => {
         );
       }
     });
+  } else {
+    ws.on("message", (data) => {
+      ws.send(data.toString());
+      ws.send("sucker, viene sin protocol >:)");
+    });
   }
 });
 
@@ -45,3 +50,16 @@ export function broadcast(id, data) {
 }
 
 export default wsServ;
+
+// import { WebSocketServer } from "ws";
+
+// const wsServ = new WebSocketServer({ noServer: true });
+// export default wsServ;
+
+// wsServ.on("connection", (ws, request) => {
+//   ws.on("error", console.error);
+
+//   ws.on("message", (data) => {
+//     console.log("received: %s", data, "from");
+//   });
+// });
