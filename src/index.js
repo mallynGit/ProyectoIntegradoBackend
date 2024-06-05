@@ -124,6 +124,7 @@ try {
       ws.on("message", (data) => {
         ws.send(data.toString());
         ws.send("sucker, viene sin protocol >:)");
+        console.log(data.toString(), 'vale?')
       });
 
       ws.on("close", () => {
