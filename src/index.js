@@ -5,23 +5,23 @@ import db from "./db/db.js";
 import fs from "fs";
 import path from "path";
 import cors from "cors";
-import { default as wsServ } from "./server/websocket.js";
-import expressWs from "express-ws";
-import https from 'https'
+import https from "https";
+import { WebSocketServer } from "ws";
 
 const __dirname = path.resolve() + "/src";
 
 const app = express();
 dotenv.config();
 
-const server = https.createServer({
-  key: fs.readFileSync('src/cert/key.pem'),
-  cert: fs.readFileSync('src/cert/cert.pem')
-}, app)
-
+const server = https.createServer(
+  {
+    key: fs.readFileSync("src/cert/key.pem"),
+    cert: fs.readFileSync("src/cert/cert.pem"),
+  },
+  app
+);
 
 try {
-  
   console.log(
     process.env.TZ,
     "process.env.TZ",
@@ -62,23 +62,57 @@ try {
     });
   });
 
-  server.on("upgrade", (request, socket, head) => {
-    console.log("ha llegado al servidor");
-    socket.on("error", console.error);
-
-    socket.removeListener('error', console.error);
-
-    
-
-    wsServ.handleUpgrade(request, socket, head, (ws) => {
-      wsServ.emit("connection", ws, request);
-      console.log("upgrade handled?");
-    });
-  });
-
   server.listen(process.env.APP_PORT, () =>
     console.log(`Listening on port ${process.env.APP_PORT}`)
   );
+
+  let wsServ = new WebSocketServer({ server: server });
+
+  wsServ.on("connection", (ws) => {
+    ws.on("error", console.error);
+    console.log("ha llegado al ws");
+    if (ws.protocol && !wsChannels[ws.protocol]) {
+      wsChannels[ws.protocol] = [];
+    }
+    if (ws.protocol) {
+      console.log("Client connected", ws.protocol);
+      wsChannels[ws.protocol].push(ws);
+      ws.on("message", (data) => {
+        let msg = data.toString();
+        msg = JSON.parse(msg);
+        if (msg.id) {
+          if (msg.content) {
+            broadcast(ws.protocol, msg);
+          }
+          // wsChannels[msg.id] = ws;
+          console.log("observa el array", wsChannels[ws.protocol].length);
+        }
+      });
+
+      ws.on("close", (data) => {
+        console.log("desconectado :(", data);
+        if (ws.protocol) {
+          wsChannels[ws.protocol].splice(
+            wsChannels[ws.protocol].indexOf(ws),
+            1
+          );
+          console.log(
+            "observa el array despues de disconnect",
+            wsChannels[ws.protocol].length
+          );
+        }
+      });
+    } else {
+      ws.on("message", (data) => {
+        ws.send(data.toString());
+        ws.send("sucker, viene sin protocol >:)");
+      });
+
+      ws.on("close", () => {
+        console.log("desconectado sin protocolo :(");
+      });
+    }
+  });
 
   // ws.options.server = app;
   // ws.options.noServer = false;
@@ -90,3 +124,5 @@ try {
 } catch (err) {
   console.log("Crash at " + new Date() + " with error: " + err);
 }
+
+export { server };
