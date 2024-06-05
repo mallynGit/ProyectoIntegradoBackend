@@ -7,14 +7,18 @@ import path from "path";
 import cors from "cors";
 import { default as wsServ } from "./server/websocket.js";
 import expressWs from "express-ws";
-import http from 'http'
+import https from 'https'
 
 const __dirname = path.resolve() + "/src";
 
 const app = express();
 dotenv.config();
 
-const server = http.createServer(app)
+const server = https.createServer({
+  key: fs.readFileSync('src/cert/key.pem'),
+  cert: fs.readFileSync('src/cert/cert.pem')
+}, app)
+
 
 try {
   
