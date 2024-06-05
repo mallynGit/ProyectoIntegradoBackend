@@ -62,13 +62,9 @@ try {
     });
   });
 
-  server.listen(process.env.APP_PORT, () =>
-    console.log(`Listening on port ${process.env.APP_PORT}`)
-  );
-
   let wsServ = new WebSocketServer({ server: server });
 
-wsServ.on("error", console.error);
+  wsServ.on("error", console.error);
 
   wsServ.on("connection", (ws) => {
     ws.on("error", console.error);
@@ -123,6 +119,10 @@ wsServ.on("error", console.error);
   // app.listen(process.env.APP_PORT, () =>
   //   console.log(`Listening on port ${process.env.APP_PORT}`)
   // );
+
+  server.listen(process.env.APP_PORT, () =>
+    console.log(`Listening on port ${process.env.APP_PORT}`)
+  );
 } catch (err) {
   console.log("Crash at " + new Date() + " with error: " + err);
 }
