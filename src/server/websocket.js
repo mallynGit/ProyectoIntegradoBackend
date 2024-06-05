@@ -5,6 +5,7 @@ const wsServ = new WebSocketServer({ noServer: true });
 export const wsChannels = {};
 
 wsServ.on("connection", (ws) => {
+  ws.on("error", console.error);
   if (ws.protocol && !wsChannels[ws.protocol]) {
     wsChannels[ws.protocol] = [];
   }
