@@ -1,6 +1,6 @@
 import { WebSocketServer } from "ws";
 
-const wsServ = new WebSocketServer({ port: 4000 });
+const wsServ = new WebSocketServer({ noServer: true });
 
 export const wsChannels = {};
 
@@ -24,13 +24,15 @@ wsServ.on("connection", (ws) => {
     });
 
     ws.on("close", (data) => {
-      console.log('desconectado :(', data)
+      console.log("desconectado :(", data);
       if (ws.protocol) {
         wsChannels[ws.protocol].splice(wsChannels[ws.protocol].indexOf(ws), 1);
-        console.log("observa el array despues de disconnect", wsChannels[ws.protocol].length);
+        console.log(
+          "observa el array despues de disconnect",
+          wsChannels[ws.protocol].length
+        );
       }
-    })
-
+    });
   }
 });
 

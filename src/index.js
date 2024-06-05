@@ -6,6 +6,7 @@ import fs from "fs";
 import path from "path";
 import cors from "cors";
 import { default as ws } from "./server/websocket.js";
+import expressWs from "express-ws";
 
 const __dirname = path.resolve() + "/src";
 
@@ -13,6 +14,8 @@ const app = express();
 dotenv.config();
 
 try {
+  ws.options.noServer = false;
+  const wsTest = expressWs(app).getWss();
   console.log(
     process.env.TZ,
     "process.env.TZ",
@@ -53,7 +56,17 @@ try {
     });
   });
 
-  
+  app.ws("/ws", function (ws, req) {
+    console.log("new connection");
+  });
+
+  app.get("/ws", function (req, res) {
+    console.log(wsTest.clients);
+    res.send('jaja')
+  });
+
+  // ws.options.server = app;
+  // ws.options.noServer = false;
 
   // app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
   app.listen(process.env.APP_PORT, () =>

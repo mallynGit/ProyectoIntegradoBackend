@@ -6,6 +6,7 @@ import postRoutes from './postRoutes.js'
 import commentRoutes from './commentRoutes.js'
 import reportRoutes from './reportRoutes.js'
 import conversationRoutes from './conversationRoutes.js'
+import {default as ws} from '../server/websocket.js'
 
 const router = Router()
 
@@ -22,7 +23,9 @@ router.get('/', (req, res) => {
 })
 
 router.get('/test/test', (req, res) => {
+    console.log(ws.options, 'va')
     res.send('TEST FUNCIONANDO')
 })
+
 
 export default router
