@@ -5,20 +5,33 @@ import db from "./db/db.js";
 import fs from "fs";
 import path from "path";
 import cors from "cors";
-import https from "https";
-import { WebSocketServer } from "ws";
+import http from "http";
+import { Server } from "socket.io";
 
 const __dirname = path.resolve() + "/src";
 
 const app = express();
 dotenv.config();
 
-const server = https.createServer(
-  {
-    key: fs.readFileSync("src/cert/key.pem"),
-    cert: fs.readFileSync("src/cert/cert.pem"),
-  },
+const server = http.createServer(
+  // {
+  //   key: fs.readFileSync("src/cert/key.pem"),
+  //   cert: fs.readFileSync("src/cert/cert.pem"),
+  // },
   app
+);
+
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+    credentials: true,
+    allowedHeaders: ["Access-Control-Allow-Origin"],
+  },
+});
+
+server.listen(process.env.APP_PORT, () =>
+  console.log(`Listening on port ${process.env.APP_PORT}`)
 );
 
 try {
@@ -62,12 +75,15 @@ try {
     });
   });
 
-  let wsServ = new WebSocketServer({ server: server });
+  io.on("error", console.error);
 
-  wsServ.on("error", console.error);
-
-  wsServ.on("connection", (ws) => {
+  io.on("connection", (ws) => {
     ws.on("error", console.error);
+    console.log(io.engine.clientsCount)
+    ws.on("disconnect", () => {
+      console.log("desconectado");
+      console.log(io.engine.clientsCount, 'after dc')
+    })
     console.log("ha llegado al ws");
     if (ws.protocol && !wsChannels[ws.protocol]) {
       wsChannels[ws.protocol] = [];
@@ -119,10 +135,6 @@ try {
   // app.listen(process.env.APP_PORT, () =>
   //   console.log(`Listening on port ${process.env.APP_PORT}`)
   // );
-
-  server.listen(process.env.APP_PORT, () =>
-    console.log(`Listening on port ${process.env.APP_PORT}`)
-  );
 } catch (err) {
   console.log("Crash at " + new Date() + " with error: " + err);
 }
