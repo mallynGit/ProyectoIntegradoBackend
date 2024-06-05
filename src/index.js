@@ -42,7 +42,10 @@ try {
     "hola?"
   );
   app.use(express.json());
-  app.use(cors());
+  app.use(cors({
+    origin: "*",
+    allowedHeaders: ["Access-Control-Allow-Origin", "Content-Type"],
+  }));
   app.use(router);
 
   // para sacar multimedia
