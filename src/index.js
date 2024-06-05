@@ -59,9 +59,12 @@ try {
   });
 
   server.on("upgrade", (request, socket, head) => {
+    console.log("ha llegado al servidor");
     socket.on("error", console.error);
 
     socket.removeListener('error', console.error);
+
+    
 
     wsServ.handleUpgrade(request, socket, head, (ws) => {
       wsServ.emit("connection", ws, request);

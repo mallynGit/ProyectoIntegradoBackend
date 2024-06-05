@@ -6,6 +6,7 @@ export const wsChannels = {};
 
 wsServ.on("connection", (ws) => {
   ws.on("error", console.error);
+  console.log("ha llegado al ws");
   if (ws.protocol && !wsChannels[ws.protocol]) {
     wsChannels[ws.protocol] = [];
   }
@@ -38,6 +39,10 @@ wsServ.on("connection", (ws) => {
     ws.on("message", (data) => {
       ws.send(data.toString());
       ws.send("sucker, viene sin protocol >:)");
+    });
+
+    ws.on("close", () => {
+      console.log("desconectado sin protocolo :(");
     });
   }
 });
