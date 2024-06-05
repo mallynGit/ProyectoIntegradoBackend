@@ -68,6 +68,8 @@ try {
 
   let wsServ = new WebSocketServer({ server: server });
 
+wsServ.on("error", console.error);
+
   wsServ.on("connection", (ws) => {
     ws.on("error", console.error);
     console.log("ha llegado al ws");
