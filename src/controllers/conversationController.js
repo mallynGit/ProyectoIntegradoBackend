@@ -1,6 +1,6 @@
 import { model } from "../models/conversation.js";
 import mensaje from "../models/mensajeObject.js";
-import { wsChannels, broadcast } from "../server/websocket.js";
+import { wsChannels, io} from "../index.js";
 
 export const get = async (req, res) => {
   const { id } = req.query;
@@ -67,14 +67,14 @@ export const addMessage = async (req, res) => {
   let contenido = content;
 
   const found = await model.findById({ _id: id });
+  
   if (found) {
     const message = { contenido, autor }
-    found.mensajes.push(message);
-    found.save();
+    // found.mensajes.push(message);
+    // found.save();
     res.json({ status: "ok" });
-    if (wsChannels[id]) {
-      broadcast(id, { id, content, autor });
-    }
+    console.log(id, content, autor, 'id, content, autor');
+    io.to(id).emit("new msg", { id, content, autor });
   } else {
     return res.status(404).send({ error: "Conversation not found" });
   }

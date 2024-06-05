@@ -29,6 +29,7 @@ const io = new Server(server, {
     allowedHeaders: ["Access-Control-Allow-Origin"],
   },
 });
+export const wsChannels = {};
 
 server.listen(process.env.APP_PORT, () =>
   console.log(`Listening on port ${process.env.APP_PORT}`)
@@ -82,55 +83,76 @@ try {
   io.on("error", console.error);
 
   io.on("connection", (ws) => {
+    let user = ws.handshake.auth.user;
+    wsChannels[user] = ws;
     ws.on("error", console.error);
-    console.log(io.engine.clientsCount);
+    console.log("conexion, clientcount:", io.engine.clientsCount);
+    console.log("ws id auth", ws.handshake.auth.user);
+
     ws.on("disconnect", () => {
-      console.log("desconectado");
-      console.log(io.engine.clientsCount, "after dc");
+      console.log("disconnect, after dc:", io.engine.clientsCount);
+      delete wsChannels[user];
     });
+
+    ws.on("message", (data) => {
+      let msg = data.toString();
+      msg = JSON.parse(msg);
+    });
+
+    ws.on("join", (data) => {
+      console.log("join:", data, user);
+
+      ws.join(data);
+    });
+
+    ws.on("new msg", (data) => {
+      console.log("new msg:", data, ws.id);
+      console.log("rooms", ws.rooms);
+    });
+
     console.log("ha llegado al ws");
-    if (ws.protocol && !wsChannels[ws.protocol]) {
-      wsChannels[ws.protocol] = [];
-    }
-    if (ws.protocol) {
-      console.log("Client connected", ws.protocol);
-      wsChannels[ws.protocol].push(ws);
-      ws.on("message", (data) => {
-        let msg = data.toString();
-        msg = JSON.parse(msg);
-        if (msg.id) {
-          if (msg.content) {
-            broadcast(ws.protocol, msg);
-          }
-          // wsChannels[msg.id] = ws;
-          console.log("observa el array", wsChannels[ws.protocol].length);
-        }
-      });
+    // if (ws.protocol && !wsChannels[ws.protocol]) {
+    //   wsChannels[ws.protocol] = [];
+    // }
+    // if (ws.protocol) {
+    //   console.log("Client connected", ws.protocol);
+    //   wsChannels[ws.protocol].push(ws);
+    //   ws.on("message", (data) => {
+    //     let msg = data.toString();
+    //     msg = JSON.parse(msg);
+    //     if (msg.id) {
+    //       if (msg.content) {
+    //         broadcast(ws.protocol, msg);
+    //       }
+    //       // wsChannels[msg.id] = ws;
+    //       console.log("observa el array", wsChannels[ws.protocol].length);
+    //     }
+    //   });
 
-      ws.on("close", (data) => {
-        console.log("desconectado :(", data);
-        if (ws.protocol) {
-          wsChannels[ws.protocol].splice(
-            wsChannels[ws.protocol].indexOf(ws),
-            1
-          );
-          console.log(
-            "observa el array despues de disconnect",
-            wsChannels[ws.protocol].length
-          );
-        }
-      });
-    } else {
-      ws.on("message", (data) => {
-        ws.send(data.toString());
-        ws.send("sucker, viene sin protocol >:)");
-        console.log(data.toString(), 'vale?')
-      });
+    //   ws.on("close", (data) => {
+    //     console.log("desconectado :(", data);
+    //     if (ws.protocol) {
+    //       wsChannels[ws.protocol].splice(
+    //         wsChannels[ws.protocol].indexOf(ws),
+    //         1
+    //       );
+    //       console.log(
+    //         "observa el array despues de disconnect",
+    //         wsChannels[ws.protocol].length
+    //       );
+    //     }
+    //   });
+    // } else {
+    ws.on("message", (data) => {
+      ws.send(data.toString());
+      ws.send("sucker, viene sin protocol >:)");
+      console.log(data.toString(), "vale?");
+    });
 
-      ws.on("close", () => {
-        console.log("desconectado sin protocolo :(");
-      });
-    }
+    ws.on("close", () => {
+      console.log("desconectado sin protocolo :(");
+    });
+    // }
   });
 
   // ws.options.server = app;
@@ -144,4 +166,4 @@ try {
   console.log("Crash at " + new Date() + " with error: " + err);
 }
 
-export { server };
+export { server, io };
