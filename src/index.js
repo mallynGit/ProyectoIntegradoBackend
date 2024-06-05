@@ -42,10 +42,11 @@ try {
     "hola?"
   );
   app.use(express.json());
-  app.use(cors({
-    origin: "*",
-    allowedHeaders: ["Access-Control-Allow-Origin", "Content-Type"],
-  }));
+  app.use(
+    cors({
+      origin: "*",
+    })
+  );
   app.use(router);
 
   // para sacar multimedia
@@ -82,11 +83,11 @@ try {
 
   io.on("connection", (ws) => {
     ws.on("error", console.error);
-    console.log(io.engine.clientsCount)
+    console.log(io.engine.clientsCount);
     ws.on("disconnect", () => {
       console.log("desconectado");
-      console.log(io.engine.clientsCount, 'after dc')
-    })
+      console.log(io.engine.clientsCount, "after dc");
+    });
     console.log("ha llegado al ws");
     if (ws.protocol && !wsChannels[ws.protocol]) {
       wsChannels[ws.protocol] = [];
