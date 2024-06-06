@@ -49,8 +49,7 @@ export const getById = async (req, res) => {
         },
     ]).unwind('$master');
 
-    const hola = await model.populate(test, { path: 'multimedia' })
-    let adios = await user.populate(hola, { path: 'master', select: '-password -pets -posts -role -email' })
+    let adios = await user.populate(test, { path: 'master', select: '-password -pets -posts -role -email' })
     adios = await model.populate(adios, { path: 'comentarios' })
     adios = await model.populate(adios, { path: 'comentarios.autor', select: 'nick _id' })
     adios = await model.populate(adios, { path: 'comentarios.respuestas', select: '-respuestas' })

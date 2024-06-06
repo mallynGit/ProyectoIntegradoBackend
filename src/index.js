@@ -110,56 +110,10 @@ try {
       console.log("rooms", ws.rooms);
     });
 
-    console.log("ha llegado al ws");
-    // if (ws.protocol && !wsChannels[ws.protocol]) {
-    //   wsChannels[ws.protocol] = [];
-    // }
-    // if (ws.protocol) {
-    //   console.log("Client connected", ws.protocol);
-    //   wsChannels[ws.protocol].push(ws);
-    //   ws.on("message", (data) => {
-    //     let msg = data.toString();
-    //     msg = JSON.parse(msg);
-    //     if (msg.id) {
-    //       if (msg.content) {
-    //         broadcast(ws.protocol, msg);
-    //       }
-    //       // wsChannels[msg.id] = ws;
-    //       console.log("observa el array", wsChannels[ws.protocol].length);
-    //     }
-    //   });
-
-    //   ws.on("close", (data) => {
-    //     console.log("desconectado :(", data);
-    //     if (ws.protocol) {
-    //       wsChannels[ws.protocol].splice(
-    //         wsChannels[ws.protocol].indexOf(ws),
-    //         1
-    //       );
-    //       console.log(
-    //         "observa el array despues de disconnect",
-    //         wsChannels[ws.protocol].length
-    //       );
-    //     }
-    //   });
-    // } else {
-    ws.on("message", (data) => {
-      ws.send(data.toString());
-      ws.send("sucker, viene sin protocol >:)");
-      console.log(data.toString(), "vale?");
-    });
-
-    ws.on("close", () => {
-      console.log("desconectado sin protocolo :(");
-    });
     // }
   });
 
-  // ws.options.server = app;
-  // ws.options.noServer = false;
-
-  // app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
-  // app.listen(process.env.APP_PORT, () =>
+   // app.listen(process.env.APP_PORT, () =>
   //   console.log(`Listening on port ${process.env.APP_PORT}`)
   // );
 } catch (err) {

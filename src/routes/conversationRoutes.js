@@ -2,8 +2,8 @@ import {
   testChat,
   createChat,
   get,
-  getAll,
-  addMessage
+  addMessage,
+  getAllByUser
 } from "../controllers/conversationController.js";
 import { Router } from "express";
 
@@ -12,7 +12,7 @@ const router = Router();
 router.post("/testChat", testChat);
 router.post("/createChat", createChat);
 router.get("/get", get);
-router.get("/getAll", getAll);
+router.get("/getAll", getAllByUser);
 router.post("/sendMsg", addMessage);
 
 export default router;
