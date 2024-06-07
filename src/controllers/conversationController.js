@@ -71,8 +71,8 @@ export const addMessage = async (req, res) => {
 
   if (found) {
     const message = { contenido, autor };
-    // found.mensajes.push(message);
-    // found.save();
+    found.mensajes.push(message);
+    found.save();
     res.json({ status: "ok" });
     console.log(id, content, autor, "id, content, autor");
     io.to(id).emit("new msg", {
