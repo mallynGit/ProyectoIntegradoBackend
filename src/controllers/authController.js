@@ -19,6 +19,10 @@ export const login = async (req, res) => {
     return res.status(401).send({ error: "Login failed" });
   }
 
+  if(user.bloqueado == true){
+    return res.status(403).send({ error: "User blocked" });
+  }
+
   delete user._doc.password
 
 

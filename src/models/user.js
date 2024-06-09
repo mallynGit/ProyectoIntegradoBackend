@@ -12,11 +12,11 @@ const userSchema = new mongoose.Schema({
     email: { type: String, unique: true, required: true },
     password: { type: String, required: true },
     pets: [{ type: String, ref: "Pet" }],
-    posts: [{ type: String, ref: "Posts" }],
     role: {
         type: String,
         default: 'USER'
     },
+    bloqueado: { type: Boolean, default: false },
 },
     { versionKey: false }
 )

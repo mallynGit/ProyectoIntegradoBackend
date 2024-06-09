@@ -13,7 +13,8 @@ const postSchema = new mongoose.Schema({
     autor: {
         type: String,
         ref: "User"
-    }
+    },
+    comentarios: [{ type: String, ref: "Comentario" }]
 },
     { versionKey: false }
 )

@@ -119,22 +119,34 @@ export const create = async (req, res) => {
 };
 
 export const update = async (req, res) => {
-  const { nombre, raza, categoria, edad, foto_perfil, _id } = req.body;
+  const { nombre, raza, categoria, edad, _id, sexo, peso } = req.body;
+  let foto_perfil;
+  try {
+    if (req.file) {
+      if (req.file.update) {
+        let pet = await model.findById({ _id });
+        foto_perfil = req.file.filename.split(".")[0];
+        pet.multimedia.push(foto_perfil);
+        pet.save();
+      }
+    }
 
-  model
-    .findByIdAndUpdate(
-      { _id },
-      { nombre, raza, categoria, edad, foto_perfil },
-      { new: true }
-    )
-    .then((updated) => {
-      res.json(updated);
-    })
-    .catch((err) => {
-      console.log(err);
-      return res.status(500).send({ error: "Error updating pet" });
-    });
-
+    model
+      .findByIdAndUpdate(
+        { _id },
+        { nombre, raza, sexo, peso, categoria, edad, foto_perfil },
+        { new: true }
+      )
+      .then((updated) => {
+        res.json(updated);
+      })
+      .catch((err) => {
+        console.log(err);
+        return res.status(500).send({ error: "Error updating pet" });
+      });
+  } catch (err) {
+    console.error(err);
+  }
   // res.json(updatedPet)
 };
 
@@ -158,4 +170,13 @@ export const deletePet = async (req, res) => {
     console.log(err);
     res.status(500).json({ err: err });
   }
+};
+
+export const addMedia = async (req, res) => {
+  const { petId } = req.body;
+  const mediaId = req.file.filename.split(".")[0];
+  const pet = await model.findById({ _id: petId });
+  pet.multimedia.push(mediaId);
+  pet.save();
+  res.json(pet);
 };

@@ -72,3 +72,12 @@ export const deleteUser = async (req, res) => {
 
   res.send(user);
 };
+
+export const blockUser = async (req, res) =>{
+
+  const { id } = req.params;
+
+  const user = await model.findOneAndUpdate({ _id: id }, { bloqueado: true }, { new: true })
+
+  res.send(user)
+}
