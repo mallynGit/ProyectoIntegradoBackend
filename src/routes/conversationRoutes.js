@@ -3,7 +3,8 @@ import {
   createChat,
   get,
   addMessage,
-  getAllByUser
+  getAllByUser,
+  downloadChat
 } from "../controllers/conversationController.js";
 import { Router } from "express";
 
@@ -14,5 +15,6 @@ router.post("/createChat", createChat);
 router.get("/get", get);
 router.get("/getAll", getAllByUser);
 router.post("/sendMsg", addMessage);
+router.get('/download', downloadChat)
 
 export default router;

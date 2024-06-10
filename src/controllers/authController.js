@@ -82,7 +82,7 @@ export const register = async (req, res) => {
           delete parsedPets[i].number
           mascotas.push({ _id: ids[`pet${i + 1}`], foto_perfil: ids[`pet${i + 1}`], multimedia: [ids[`pet${i + 1}`]], ...parsedPets[i] })
         }
-        let user = new model({ _id: req.userimage, nombre, apellidos, email, password, nick, pets: Object.values(ids) })
+        let user = new model({ _id: req.userimage, nombre, apellidos, email, password: bcrypt.hashSync(trimmedPassword, 10), nick, pets: Object.values(ids) })
 
         await pet.insertMany(mascotas, { session })
         await user.save()

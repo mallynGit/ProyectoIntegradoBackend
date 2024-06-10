@@ -1,5 +1,7 @@
 import { model } from "../models/pet.js";
 import { model as user } from "../models/user.js";
+import { model as post } from "../models/post.js";
+import { model as comment } from "../models/comentario.js";
 import fs from "fs";
 
 export const get = async (req, res) => {
@@ -87,11 +89,10 @@ export const getById = async (req, res) => {
 };
 
 export const create = async (req, res) => {
-  const { nombre, raza, categoria, edad, userId } = req.body;
-  let pet, multimedia, mediaId;
+  const { nombre, raza, categoria, edad, userId, sexo, peso } = req.body;
+  let pet, multimedia;
   try {
     if (req.file) {
-      mediaId = req.file.filename.split(".");
       console.log(req.file);
     }
     let petMaster = await user.findById({ _id: userId });
@@ -100,7 +101,9 @@ export const create = async (req, res) => {
       raza,
       categoria,
       edad,
-      foto_perfil: req.file ? multimedia._id : null,
+      sexo,
+      peso,
+      foto_perfil: req.file ? req.file.filename.split(".")[0] : null,
     });
     if (petMaster.pets.includes(pet._id)) {
       petMaster.pets.splice(petMaster.pets.indexOf(pet._id), 1);
@@ -109,7 +112,7 @@ export const create = async (req, res) => {
       petMaster.pets.push(pet._id);
       petMaster.save();
     }
-    pet.multimedia.push(multimedia._id);
+    pet.multimedia.push(req.file.filename.split(".")[0]);
     pet.save();
   } catch (err) {
     console.log(err);
@@ -155,6 +158,13 @@ export const deletePet = async (req, res) => {
     const { id } = req.query;
 
     const deletedPet = await model.findByIdAndDelete({ _id: id });
+    for (let posts of deletedPet.posts) {
+      await post.deleteOne({ _id: posts._id });
+    }
+    for(let comments of deletedPet.comentarios){
+      await comment.deleteOne({ _id: comments._id });
+    }
+
     console.log(deletedPet);
     for (let multimedia of deletedPet.multimedia) {
       await media.deleteOne({ _id: multimedia._id });

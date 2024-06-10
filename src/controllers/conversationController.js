@@ -1,5 +1,5 @@
 import { model } from "../models/conversation.js";
-
+import fs from 'fs'
 import { wsChannels, io } from "../index.js";
 
 export const get = async (req, res) => {
@@ -26,6 +26,21 @@ export const updateChat = async (req, res) => {
     return res.json(newConversacion);
   }
   res.json(conversacion);
+};
+
+export const downloadChat = async (req, res) => {
+  const { id } = req.query;
+  let report = "";
+  const chat = await model
+    .findById(id)
+    .populate({ path: "mensajes.autor", select: "nick" });
+  for (let msg of chat.mensajes) {
+    report +=
+      "[" + msg.timestamp.toLocaleString({ timeZone: "Europe/Madrid" }) + "] " + msg.autor.nick + ": " + msg.contenido + "\n";
+  }
+  fs.writeFileSync(id + ".txt", report);
+  res.download(id + ".txt");
+  setTimeout(() => fs.unlinkSync(id + ".txt"), 10000);
 };
 
 export const createChat = async (req, res) => {

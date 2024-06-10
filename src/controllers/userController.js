@@ -1,5 +1,9 @@
 import { model } from "../models/user.js";
 import { model as pet } from "../models/pet.js";
+import { model as chat } from "../models/conversation.js";
+import { model as post } from "../models/post.js";
+import { model as comment } from "../models/comentario.js";
+import fs from "fs";
 import bcrypt from "bcrypt";
 
 export const get = async (req, res) => {
@@ -14,13 +18,13 @@ export const get = async (req, res) => {
 };
 
 export const getPetsByUser = async (req, res) => {
+  const { id } = req.params;
 
-    const {id} = req.params
+  const user = await model
+    .findOne({ _id: id }, { password: 0 })
+    .populate({ path: "pets" });
 
-    const user = await model.findOne({ _id: id }, { password: 0 }).populate({ path: "pets" })
-
-    res.json(user.pets)
-
+  res.json(user.pets);
 };
 
 export const registerUser = async (req, res) => {
@@ -39,7 +43,8 @@ export const registerUser = async (req, res) => {
 
 export const update = async (req, res) => {
   const { id } = req.params;
-  const { nombre, apellidos, email, nick } = req.body;
+  const { nombre, apellidos, email, nick, bloqueado } = req.body;
+
 
   console.log(req.token);
   const requestant = await model.findOne({ _id: req.token });
@@ -50,13 +55,13 @@ export const update = async (req, res) => {
     } else {
       user = await model.findOneAndUpdate(
         { _id: id },
-        { nombre, apellidos, email, nick }
+        { nombre, apellidos, email, nick, bloqueado }
       );
     }
   } else {
     user = await model.findOneAndUpdate(
       { _id: requestant._id },
-      { nombre, apellidos, email, nick },
+      { nombre, apellidos, email, nick, bloqueado },
       { new: true }
     );
   }
@@ -68,16 +73,25 @@ export const update = async (req, res) => {
 export const deleteUser = async (req, res) => {
   const { id } = req.params;
 
-  const user = await model.deleteOne({ _id: id }, {}, { new: true });
+  console.log(id)
 
+  const user = await model.findOne({ _id: id });
+  await pet.deleteMany({ _id: { $in: user.pets } });
+  await post.deleteMany({ autor: user._id });
+  await comment.deleteMany({ autor: user._id });
+  await chat.deleteMany({ participantes: { $in: user._id } });
+  await model.deleteOne({ _id: id });
   res.send(user);
 };
 
-export const blockUser = async (req, res) =>{
-
+export const blockUser = async (req, res) => {
   const { id } = req.params;
 
-  const user = await model.findOneAndUpdate({ _id: id }, { bloqueado: true }, { new: true })
+  const user = await model.findOneAndUpdate(
+    { _id: id },
+    { bloqueado: true },
+    { new: true }
+  );
 
-  res.send(user)
-}
+  res.send(user);
+};

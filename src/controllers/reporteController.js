@@ -136,6 +136,7 @@ export const deleteReport = async (req, res) => {
 
 export const checkResuelto = async (req, res) => {
   const { id } = req.query;
+  console.log(id, 'vale?')
   const report = await model.findById(id);
   report.resuelto = !report.resuelto;
   await report.save();

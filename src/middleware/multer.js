@@ -1,40 +1,53 @@
 import multer from "multer";
 import path from "path";
+import fs from 'fs';
+import crypto from 'crypto';
 
 const __dirname = path.resolve() + "/src";
+const uploads = path.join(__dirname, "uploads");
+
+// Función para eliminar el archivo antiguo
+const deleteOldFile = (userId) => {
+  const files = fs.readdirSync(uploads);
+  const found = files.find((file) => file.split(".")[0] == userId);
+  if (found) {
+    fs.unlinkSync(path.join(uploads, found));
+    return true;
+  }
+  return false;
+};
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const randomId = crypto.randomUUID();
-    if (file.originalname.split(".")[0].includes("test")) {
-      file.originalname = randomId + path.extname(file.originalname);
-      req.userimage = randomId;
-      file.test = true;
-    } else if (file.originalname.split(".")[0].includes("pet")) {
+    if (file.originalname.split(".")[0].includes("pet")) {
       console.log("hay :)");
       const randomId = crypto.randomUUID();
       req.pets = { ...req.pets, [file.originalname.split(".")[0]]: randomId };
       file.originalname = randomId + path.extname(file.originalname);
     } else if (file.originalname.split(".")[0].includes("update")) {
-      file.update = crypto.randomUUID();
+      if (req.body.updateUser == true) {
+        let userId = req.body.userId;
+        const isDeleted = deleteOldFile(userId);
+        if (isDeleted) {
+          file.originalname = userId + path.extname(file.originalname);
+        } else {
+          file.originalname = crypto.randomUUID() + path.extname(file.originalname);
+        }
+      } else {
+        file.originalname = crypto.randomUUID() + path.extname(file.originalname);
+      }
       console.log("BIEN!!!");
     }
     console.log(req.query, file, "query y file ?");
-    cb(null, path.join(__dirname, "/uploads"));
+    cb(null, uploads);
   },
   filename: (req, file, cb) => {
-    req.pets ? console.log("hay pets", req.pets) : null;
-    file.test ? console.log("esta es especial") : null;
-    if (!file.test && !req.pets) {
-      cb(
-        null,
-        (req.query.filename ? req.query.filename : crypto.randomUUID()) +
-          path.extname(file.originalname)
-      );
+    if (req.body.updateUser) {
+      console.log('EXISTE EL PUTO FILE UPDATE');
+      cb(null, req.body.userId + path.extname(file.originalname));
     } else {
       const randomId = crypto.randomUUID();
-
-      cb(null, randomId);
+      cb(null, randomId + path.extname(file.originalname));
     }
   },
 });
